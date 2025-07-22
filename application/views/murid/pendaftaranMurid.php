@@ -59,7 +59,27 @@ $(document).ready(function() {
             { "data": "nama" },
             { "data": "nis","width": "10%"},
             { "data": "tanggal_lahir" },
-            { "data": "umur" },
+            {
+                "data": null,
+                "className": 'text-center',
+                "render": function (data, type, row) {
+                    if (!row.tanggal_lahir) return '';
+                    const birthDate = new Date(row.tanggal_lahir);
+                    const today = new Date();
+                    let years = today.getFullYear() - birthDate.getFullYear();
+                    let months = today.getMonth() - birthDate.getMonth();
+
+                    if (today.getDate() < birthDate.getDate()) {
+                        months--;
+                    }
+                    if (months < 0) {
+                        years--;
+                        months += 12;
+                    }
+
+                    return years + ' th ' + months + ' bl';
+                }
+            },
             { "data": "namaIbuKandung" },
             {
                 "data": null,

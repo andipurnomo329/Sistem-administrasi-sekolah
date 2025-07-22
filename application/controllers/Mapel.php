@@ -48,7 +48,7 @@ class Mapel extends BaseController
     public function getData() {
         $postData = $this->input->post();
         // debug($postData);
-        $data = $this->bm->getRows($postData);
+        $data = $this->bm->getDataTable($postData);
         // log_message('debug', 'Post Data: ' . print_r($postData, true)); // Tambahkan log untuk data POST
         echo json_encode($data);
     }

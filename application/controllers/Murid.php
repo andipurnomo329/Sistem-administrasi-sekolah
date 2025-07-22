@@ -68,7 +68,8 @@ class Murid extends BaseController
     public function getData() {
         $postData = $this->input->post();
         // debug($postData);
-        $data = $this->km->getRows($postData);
+        $data = $this->km->getDataTable($postData);
+        // debug($data['aaData']);
         // log_message('debug', 'Post Data: ' . print_r($postData, true)); // Tambahkan log untuk data POST
         echo json_encode($data);
     }

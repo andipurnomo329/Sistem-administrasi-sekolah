@@ -16,7 +16,7 @@ class Kelas extends BaseController
         $this->load->model('kelas_model', 'km');
         $this->load->model('guru_model', 'mm');
 
-        $this->module = 'Menu';
+        $this->module = 'Kelas';
         $this->global['modTitle'] = $this->module;
     }
 
@@ -53,7 +53,7 @@ class Kelas extends BaseController
     public function getData() {
         $postData = $this->input->post();
         // debug($postData);
-        $data = $this->km->getRows($postData);
+        $data = $this->km->getKelasDataTable($postData);
         // log_message('debug', 'Post Data: ' . print_r($postData, true)); // Tambahkan log untuk data POST
         echo json_encode($data);
     }

@@ -1,11 +1,28 @@
 <?php if(!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Murid_model extends CI_Model
+class Murid_model extends MY_Model
 {
     protected $table = 'tbl_murid';
     protected $kolom = 'id,nama,nis,nik,jenis_kelamin,tanggal_lahir,namaWaliMurid,foto,agama,tempat_lahir,alamat,no_telp,namaIbuKandung,namaAyahKandung,pekerjaanWali,tanggalMasuk,tanggalPendaftaran';
+    
+    public function getDataTable($postData)
+    {
+        $where = [];
+        if(isset($postData['tambahan'])){
+            if($postData['tambahan'] == 1){
+                $param1 = array('tanggalPendaftaran IS NOT NULL' => null);
+                $param2 = array( 'tanggalMasuk IS NULL' => null);
+                $where = $where + $param1 + $param2 ;
+            }else{
+                $param2 = array( 'tanggalMasuk IS NOT NULL' => null);
+                $where = $where + $param2 ;
+            }
+        }
 
-    public function getRows($postData) {
+        return $this->getRows($postData, $where, 1);
+    }
+
+    public function getRowss($postData) {
         $response = array();
         $whereArray = array('isDeleted' => 0 );
         

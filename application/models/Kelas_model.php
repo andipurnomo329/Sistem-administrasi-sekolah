@@ -1,6 +1,6 @@
 <?php if(!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Kelas_model extends CI_Model
+class Kelas_model extends MY_Model
 {
     protected $table = 'tbl_kelas';
     protected $kolom = 'id_kelas,nama_kelas,tingkat,jurusan,tahun_ajaran';
@@ -8,73 +8,19 @@ class Kelas_model extends CI_Model
     protected $tableTrx = 'trx_guru'; // Nama tabel
     protected $kolomTrx = ['id_guru']; // Kolom yang dipilih
 
-    public function getRows($postData) {
-        // debug($postData['listKolom']);
-        $response = array();
-        $whereArray = array('isDeleted' => 0 );
-        
-        if(isset($postData['tahun_ajaran'])){
-            $param = array('tahun_ajaran ' => $postData['tahun_ajaran']);
-            $whereArray = array_merge($whereArray,$param);
-        }
-        ## Read value
-        $columnIndex = ($postData['order'][0]['column'] == 0 ) ? 4 : $postData['order'][0]['column'] ; // Column index
-        $columnSortOrder = $postData['order'][0]['dir']; // asc or desc
-        $searchValue = $postData['search']['value']; // Search value
+    public function __construct()
+    {
+        parent::__construct();
+    }
 
-        ## Search
-        $searchQuery = "";
-        if($searchValue != ''){
-            $searchQuery = " (nama_kelas like '%".$searchValue."%' or tahun_ajaran like '%".$searchValue."%' ) ";
+    public function getKelasDataTable($postData)
+    {
+        $where = [];
+        if (!empty($postData['tahun_ajaran'])) {
+            $where['tahun_ajaran'] = $postData['tahun_ajaran'];
         }
 
-        ## Total number of records without filtering
-        $this->db->select('count(1) as allcount');
-        $this->db->from($this->table);
-        $this->db->where($whereArray);
-        $records = $this->db->get()->result();
-        $totalRecords = $records[0]->allcount;
-
-        ## Total number of record with filtering
-        $this->db->select('count(1) as allcount');
-        $this->db->from($this->table);
-        $this->db->where($whereArray);
-        if($searchQuery != '')
-            $this->db->where($searchQuery);
-        $records = $this->db->get()->result();
-        $totalRecordwithFilter = $records[0]->allcount;
-
-        ## Fetch records
-        $this->db->select($this->kolom);
-        $this->db->from($this->table);
-        $this->db->where($whereArray);
-        if($searchQuery != '')
-            $this->db->where($searchQuery);
-        $this->db->order_by($postData['columns'][$columnIndex]['data'], $columnSortOrder);
-        $this->db->limit($postData['length'], $postData['start']);
-        $records = $this->db->get()->result();
-
-        // debug($postData);
-
-        $listKolom = explode(',',$this->kolom);
-        $data = [];
-
-        foreach ($records as $record) {
-            $row = [];
-            foreach ($listKolom as $kolom) {
-                $row[$kolom] = $record->$kolom;
-            }
-            $data[] = $row;
-        }
-
-        ## Response
-        $response = array(
-            "draw" => intval($postData['draw']),
-            "iTotalRecords" => $totalRecords,
-            "iTotalDisplayRecords" => $totalRecordwithFilter,
-            "aaData" => $data
-        );
-        return $response;
+        return $this->getRows($postData, $where, 4);
     }
 
     function addNewTask($taskInfo)

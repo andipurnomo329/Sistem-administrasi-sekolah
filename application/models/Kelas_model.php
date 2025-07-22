@@ -3,18 +3,19 @@
 class Kelas_model extends CI_Model
 {
     protected $table = 'tbl_kelas';
-    protected $kolom = 'id_kelas,nama_kelas,tingkat,jurusan,tahun_ajaran,kouta';
+    protected $kolom = 'id_kelas,nama_kelas,tingkat,jurusan,tahun_ajaran';
 
     protected $tableTrx = 'trx_guru'; // Nama tabel
     protected $kolomTrx = ['id_guru']; // Kolom yang dipilih
 
     public function getRows($postData) {
+        // debug($postData['listKolom']);
         $response = array();
         $whereArray = array('isDeleted' => 0 );
         
         if(isset($postData['tahun_ajaran'])){
-            $paramId = array('tahun_ajaran ' => $postData['tahun_ajaran']);
-            $whereArray = array_merge($whereArray,$paramId);
+            $param = array('tahun_ajaran ' => $postData['tahun_ajaran']);
+            $whereArray = array_merge($whereArray,$param);
         }
         ## Read value
         $columnIndex = ($postData['order'][0]['column'] == 0 ) ? 4 : $postData['order'][0]['column'] ; // Column index
@@ -55,18 +56,15 @@ class Kelas_model extends CI_Model
 
         // debug($postData);
 
-        $data = array();
+        $listKolom = explode(',',$this->kolom);
+        $data = [];
 
-        foreach($records as $record ){
-            $data[] = array(
-                "id_kelas"=>$record->id_kelas,
-                "nama_kelas"=>$record->nama_kelas,
-                "tingkat"=>$record->tingkat,
-                "jurusan"=>$record->jurusan,
-                "tahun_ajaran"=>$record->tahun_ajaran,
-                "kouta"=>$record->kouta,
-        
-            );
+        foreach ($records as $record) {
+            $row = [];
+            foreach ($listKolom as $kolom) {
+                $row[$kolom] = $record->$kolom;
+            }
+            $data[] = $row;
         }
 
         ## Response
@@ -78,8 +76,6 @@ class Kelas_model extends CI_Model
         );
         return $response;
     }
- 
-    
 
     function addNewTask($taskInfo)
     {
@@ -90,7 +86,6 @@ class Kelas_model extends CI_Model
         $insert_id = $this->db->insert_id();
         
         $this->db->trans_complete();
-        
         return $insert_id;
     }
 
@@ -174,4 +169,11 @@ class Kelas_model extends CI_Model
         return $this->db->get()->result();
     }
 
+    // public function countSiswaByKelas($id_kelas)
+    // {
+    //     $this->db->where('id_kelas', $id_kelas);
+    //     $this->db->where('isDeleted', 0);
+    //     $this->db->from('tbl_murid'); // Sesuaikan dengan nama tabel siswa
+    //     return $this->db->count_all_results();
+    // }
 }

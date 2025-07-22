@@ -24,7 +24,8 @@
                                         <th>Nama</th>
                                         <th>NIS</th>
                                         <th>Tanggal Lahir</th>
-                                        <th>Nama Wali</th>
+                                        <th>Umur</th>
+                                        <th>Nama Ibu</th>
                                         <th>Foto</th>
                                         <th>action</th>
                                     </tr>
@@ -46,7 +47,6 @@
 <script>
 $(document).ready(function() {
     var control = 'murid' ;
-    // let tambahan = [{tanggalPendaftaran : null}, {tanggalMasuk :}]
     koloms =[
             {
                 "data": null,
@@ -57,25 +57,25 @@ $(document).ready(function() {
                 "width": "5%"
             },
             { "data": "nama" },
-            { "data": "nis"},
+            { "data": "nis","width": "10%"},
             { "data": "tanggal_lahir" },
-            { "data": "namaWaliMurid" },
+            { "data": "umur" },
+            { "data": "namaIbuKandung" },
             {
                 "data": null,
                 "className": 'text-center',
                 "width": "8%",
                 "render": function (data, type, row) {
                     return '<img class="img-fluid " style="width: 3rem;" src="<?php echo base_url().'files/murid/'; ?>'+row.foto+'">';
+
                 }
             },
             {
                 "data": null,
                 "className": 'text-center',
-                "width": "15%",
+                "width": "5%",
                 "render": function (data, type, row) {
-                    return '<button class="btn btn-primary btn-edit btn-sm" data-id="'+row.id+'"><i class="fas fa-wrench"></i></button> ' +
-                            '<a href="<?php echo base_url('murid/detailMurid/') ?>'+row.id+'" class="d-none d-sm-inline-block btn btn-sm btn-success shadow-sm" ><i class="fas fa-eye"></i></a> ' +
-                           '<button class="btn btn-danger btn-delete btn-sm" data-id="'+row.id+'"><i class="fas fa-trash"></i></button> ' ;
+                    return '<button class="btn btn-primary btn-edit btn-sm" data-id="'+row.id+'"><i class="fas fa-check-square"></i></button> ';
                 }
             }
         ];
@@ -87,7 +87,7 @@ $(document).ready(function() {
             "url": "<?php echo base_url() ?>"+control+"/getData/",
             "type": "POST",
             "data": function(d) {
-                d.tambahan = 2 // Menambahkan parameter tambahan
+                d.tambahan = 1 // Menambahkan parameter tambahan
             }
         },
         "searchDelay": 500,

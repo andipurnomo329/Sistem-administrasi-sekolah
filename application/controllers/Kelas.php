@@ -13,9 +13,8 @@ class Kelas extends BaseController
         parent::__construct();
         
         $this->isLoggedIn();
-        $this->load->model('kelas_model', 'bm');
+        $this->load->model('kelas_model', 'km');
         $this->load->model('guru_model', 'mm');
-        $this->load->model('WaliKelas_model', 'wm');
 
         $this->module = 'Menu';
         $this->global['modTitle'] = $this->module;
@@ -27,7 +26,7 @@ class Kelas extends BaseController
      */
     public function index()
     {
-        redirect('kelas/dataList');
+        redirect('transaksi/infaqMasjid');
     }
     
     function dataList(){
@@ -37,32 +36,43 @@ class Kelas extends BaseController
         }
         else
         {
-            $pageInfo='';
+            
             $this->global['pageTitle'] = "Data Kelas";
-            $this->loadViews2("kelas/kelasList", $this->global, $pageInfo , NULL, 'kelas/kelasModal');    
+            $pageInfo['param']='7';
+            $pageInfo['inOut']='I';
+            $this->loadViews2("kelas/kelasList", $this->global, $pageInfo , NULL, 'kelas/kelaslist');    
         }
     }
     
     public function getDataById() {
         $id = $this->input->post('id');
-        $data = $this->bm->getDatabyid($id);
+        $data = $this->km->getDatabyid($id);
         echo json_encode($data);
     }
 
     public function getData() {
         $postData = $this->input->post();
         // debug($postData);
-        $data = $this->bm->getRows($postData);
+        $data = $this->km->getRows($postData);
         // log_message('debug', 'Post Data: ' . print_r($postData, true)); // Tambahkan log untuk data POST
         echo json_encode($data);
     }
 
     public function addNewTask() {
+        // debug($this->input->post());
         $clean_data = $this->security->xss_clean($this->input->post());
-        $result = $this->bm->addNewTask($clean_data);
+        // debug($clean_data);exit;
+        $taskInfo = array(
+            'nama_kelas'=>$clean_data['nama_kelas'], 
+            'tingkat'=>$clean_data['tingkat'], 
+            'jurusan'=>$clean_data['jurusan'],
+            'tahun_ajaran'=>$clean_data['tahun_ajaran'],
+        );
+
+        $result = $this->km->addNewTask($taskInfo);
 
         if($result > 0) {
-            $hasil = array("status" => TRUE, "data" => $clean_data);
+            $hasil = array("status" => TRUE);
         } else {
             $hasil = array("status" => false);
         }
@@ -70,13 +80,20 @@ class Kelas extends BaseController
     }
 
     public function updateData() {
-        $id = $this->input->post('id_kelas');
+        $id = $this->input->post('id');
         $clean_data = $this->security->xss_clean($this->input->post());
-        unset($clean_data["id_kelas"]);
-        $result = $this->bm->editTask($clean_data, $id);
+
+        $taskInfo = array(
+            'nama_kelas'=>$clean_data['nama_kelas'], 
+            'jurusan'=>$clean_data['jurusan'], 
+            'tingkat'=>$clean_data['tingkat'],
+            'tahun_ajaran'=>$clean_data['tahun_ajaran'],
+        );
+
+        $result = $this->km->editTask($taskInfo, $clean_data['id_kelas']);
 
         if($result > 0) {
-            $hasil = array("status" => TRUE, 'data'=>$clean_data);
+            $hasil = array("status" => TRUE);
         } else {
             $hasil = array("status" => false);
         }
@@ -91,10 +108,10 @@ class Kelas extends BaseController
             'updatedBy'=>$this->vendorId, 
             'updatedDtm'=>date('Y-m-d H:i:s')
         );
-        $result = $this->bm->editTask($taskInfo, $clean_data['id']);
+        $result = $this->km->editTask($taskInfo, $clean_data['id']);
 
         if($result > 0) {
-            $hasil = array("status" => TRUE, "data"=> $result);
+            $hasil = array("status" => TRUE);
         } else {
             $hasil = array("status" => false);
         }
@@ -114,7 +131,7 @@ class Kelas extends BaseController
             $this->global['pageTitle'] = "Data Kelas";
             $pageInfo['param']='7';
             $pageInfo['inOut']='I';
-            $this->loadViews2("transaksi/DataKelas/transaksiKelas", $this->global, $pageInfo , NULL, 'kelas/kelasModal');    
+            $this->loadViews2("transaksi/DataKelas/transaksiKelas", $this->global, $pageInfo , NULL, 'kelas/kelaslist');    
         }
     }
 
@@ -126,8 +143,8 @@ class Kelas extends BaseController
         else
         {
             $this->global['pageTitle'] = "Detail Data ";
-            $pageInfo['dataDetail'] = $this->bm->getTaskInfo($id);
-            $pageInfo['dataGuru'] = $this->bm->getGuruByPeople($id);
+            $pageInfo['dataDetail'] = $this->km->getTaskInfo($id);
+            $pageInfo['dataGuru'] = $this->km->getGuruByPeople($id);
             $this->loadViews2("transaksi/DataKelas/detailTransaksi", $this->global, $pageInfo , NULL,'transaksi/DataKelas/modalDetailTrx');    
         }
     }
@@ -138,9 +155,9 @@ class Kelas extends BaseController
             'id_guru' => $this->input->post('id_guru'),
             'id_kelas' => $this->input->post('id_kelas')
         ];
+
         // debug($taskInfo);
-        $insert_id = $this->bm->addTrxKelas($taskInfo);
-        
+        $insert_id = $this->km->addTrxKelas($taskInfo);
 
         if ($insert_id) {
             echo json_encode(["status" => true, "message" => "Data berhasil ditambahkan", "insert_id" => $insert_id]);
@@ -151,7 +168,7 @@ class Kelas extends BaseController
 
     public function cekGuruByKelas() {
         $id_kelas = $this->input->post('id_kelas'); // Ambil id_kelas dari request
-        $data = $this->bm->getGuruByKelas($id_kelas); // Ambil data guru
+        $data = $this->km->getGuruByKelas($id_kelas); // Ambil data guru
 
         if (!empty($data)) {
             echo json_encode(['status' => true, 'data' => $data]);
@@ -159,15 +176,6 @@ class Kelas extends BaseController
             echo json_encode(['status' => false]);
         }
     }
-
-    public function getDataWaliKelas() {
-        $postData = $this->input->post();
-        // debug($postData);
-        $data = $this->wm->getRows($postData);
-        // log_message('debug', 'Post Data: ' . print_r($postData, true)); // Tambahkan log untuk data POST
-        echo json_encode($data);
-    }
-    
 }
 
 ?>

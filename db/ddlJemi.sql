@@ -43,3 +43,11 @@ ALTER TABLE cias.tbl_murid ADD kodeMurid varchar(25) NULL;
 ALTER TABLE cias.tbl_murid ADD flagLulus varchar(100) DEFAULT 0 NULL;
 ALTER TABLE cias.tbl_murid ADD tanggalPendaftaran DATE NULL;
 ALTER TABLE cias.tbl_murid ADD tanggalMasuk DATE NULL;
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+05-03-2025
+
+ALTER TABLE cias.tbl_murid ADD tanggalKeluar DATE NULL;
+ALTER TABLE cias.tbl_murid ADD pekerjaanAyah varchar(25) NULL;
+ALTER TABLE cias.tbl_murid ADD pekerjaanIbu varchar(25) NULL;
+ALTER TABLE cias.tbl_murid ADD pekerjaanWali varchar(25) NULL;

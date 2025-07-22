@@ -9,12 +9,18 @@ class Murid_model extends CI_Model
         $response = array();
         $whereArray = array('isDeleted' => 0 );
         
-        if(isset($postData['subType'])){
-            $paramId = array('subType >' => $postData['subType']);
-            $whereArray = array_merge($whereArray,$paramId);
+        if(isset($postData['tambahan'])){
+            if($postData['tambahan'] == 1){
+                $param1 = array('tanggalPendaftaran IS NOT NULL' => null);
+                $param2 = array( 'tanggalMasuk IS NULL' => null);
+                $whereArray = $whereArray + $param1 + $param2 ;
+            }else{
+                $param2 = array( 'tanggalMasuk IS NOT NULL' => null);
+                $whereArray = $whereArray + $param2 ;
+            }
         }
         ## Read value
-        $columnIndex = ($postData['order'][0]['column'] == 0 ) ? 2 : $postData['order'][0]['column'] ; // Column index
+        $columnIndex = ($postData['order'][0]['column'] == 0 ) ? 1 : $postData['order'][0]['column'] ; // Column index
         $columnSortOrder = $postData['order'][0]['dir']; // asc or desc
         $searchValue = $postData['search']['value']; // Search value
 
@@ -53,21 +59,23 @@ class Murid_model extends CI_Model
         // debug($postData);
 
         $data = array();
-
+        $kolom = explode(',', $this->kolom);
+        // debug($kolom);
         foreach($records as $record ){
-            $data[] = array(
-                "id"=>$record->id,
-                "nama"=>$record->nama,
-                "nik"=>$record->nik,
-                "nis"=>$record->nis,
-                "foto"=>$record->foto,
-                "namaWaliMurid"=>$record->namaWaliMurid,
-                "tanggal_lahir"=>$record->tanggal_lahir,
-                "jenis_kelamin"=>$record->jenis_kelamin
-        
-            );
-        }
+            $datas = new stdClass();
+            $today = new DateTime(); // Hari ini
+            $birthdate = new DateTime($record->tanggal_lahir);
+            $umur = $today->diff($birthdate);
+            $datas->umur = $umur->y.' thn '. $umur->m . ' bln';
 
+            foreach ($kolom as $key => $value) {
+                $datas->$value = $record->$value;
+            }
+            // debug($datas);
+            array_push($data, $datas);
+            
+        }
+        // debug($data);exit;
         ## Response
         $response = array(
             "draw" => intval($postData['draw']),

@@ -38,7 +38,7 @@
                         <tr>
                             <td><strong>Wali Kelas</strong></td>
                             <td class="text-center">
-                                <div id="namaguru"> <?php echo isset($dataGuru[0]->nama_guru) ? $dataGuru[0]->nama_guru : 'Tidak Ada Wali Kelas'; ?> </div>
+                                <?php echo isset($dataGuru[0]->nama_guru) ? $dataGuru[0]->nama_guru : 'Tidak Ada Wali Kelas'; ?>
                             </td>
                         </tr>
                         <tr>
@@ -82,7 +82,7 @@
                                         <th>NIK</th>
                                         <th>NIP</th>
                                         <th>Tanggal Masuk</th>
-                                        <th>Jenis Kelamin</th>
+                                        <th>JNKL</th>
                                         <th>action</th>
                                     </tr>
                                 </thead>
@@ -107,12 +107,11 @@
 <script>
 
 $(document).ready(function() {
-    var control = 'kelas'
     var table = $('#myTable').DataTable({
         "processing": true,
         "serverSide": true,
         "ajax": {
-            "url": "<?php echo base_url() ?>"+control+'/getDataWaliKelas/',
+            "url": "<?php echo base_url('guru/getData/') ?>",
             "type": "POST",
         },
         "searchDelay": 500,
@@ -129,62 +128,69 @@ $(document).ready(function() {
             { "data": "nik"},
             { "data": "nip" },
             { "data": "tanggal_masuk" },
-            { "data": "jenis_kelamin" },
+            { 
+            "data": "jenis_kelamin", 
+            "render": function(data, type, row) {
+                return data === 'P' ? 'Laki-laki' : data === 'W' ? 'Perempuan' : 'Tidak Diketahui';
+                }
+            },
             {
-            "data": null,
-            "className": 'text-center',
-            "width": "15%",
-            "render": function (data, type, row) {
-                    return '<button class="btn btn-primary btn-input btn-sm" data-id="'+row.id_guru+'" data-id-kelas="<?php echo $dataDetail->id_kelas; ?>" data-id-nama="'+row.nama+'" ><i class="fas fa-plus"></i></button>';
+                "data": null,
+                "className": 'text-center',
+                "width": "15%",
+                "render": function (data, type, row) {
+                    return '<button class="btn btn-primary btn-edit btn-sm" data-id="'+row.id_guru+'" data-id-kelas="<?php echo $dataDetail->id_kelas; ?>"><i class="fas fa-plus"></i></button> ';
                 }
             }
-
         ]
     });
 
-    
-    var id_kelas = "<?php echo $dataDetail->id_kelas; ?>"; // Ambil ID kelas dari PHP
-    $.ajax({
-        url: "<?php echo base_url(); ?>"+control+'/cekGuruByKelas',
-        type: "POST",
-        data: { id_kelas: id_kelas },
-        dataType: "json",
-        success: function(response) {
-            console.log("Response dari server:", response); // Debugging
-            updateButtonStatus(response.status);
+    var table2 = $('#myTable2').DataTable({
+        "processing": true,
+        "serverSide": true,
+        "ajax": {
+            "url": "<?php echo base_url('guru/getData/') ?>",
+            "type": "POST",
         },
-        error: function(xhr, status, error) {
-            console.log("AJAX Error:", xhr.responseText);
-        }
+        "searchDelay": 500,
+        "columns": [
+            {
+                "data": null,
+                "render": function (data, type, row, meta) {
+                    return meta.row + meta.settings._iDisplayStart + 1;
+                },
+                "className": 'text-center',
+                "width": "5%"
+            },
+            { "data": "nama" },
+            { "data": "nik"},
+            { "data": "nip" },
+            { "data": "tanggal_masuk" },
+            { 
+            "data": "jenis_kelamin", 
+            "render": function(data, type, row) {
+                return data === 'P' ? 'Laki-laki' : data === 'W' ? 'Perempuan' : 'Tidak Diketahui';
+                }
+            },
+            {
+                "data": null,
+                "className": 'text-center',
+                "width": "15%",
+                "render": function (data, type, row) {
+                    return '<button class="btn btn-primary btn-edit btn-sm" data-id="'+row.id_guru+'" data-id-kelas="<?php echo $dataDetail->id_kelas; ?>"><i class="fas fa-plus"></i></button> ';
+                }
+            }
+        ]
     });
-    
+
     $('#inputButton').on('click',function () {
         $('#SearchData').modal('show');
         $('#myTable').removeAttr('style');
     });
-
-    var id_guru = "<?php echo isset($dataGuru[0]->id_guru) ? $dataGuru[0]->id_guru : ''; ?>";
-    console.log("ID Guru dari PHP:", id_guru);
-
-    function updateButtonStatus(status, id_guru = '') {
-        let $button = $('#inputButton');
-
-        $button
-            .toggleClass('btn-primary', status)
-            .toggleClass('btn-success', !status)
-            .html(`<i class="fas fa-download fa-sm text-white-50"></i> ${status ? 'Edit' : 'Input'} Wali Kelas`)
-            .attr('data-id-guru', status ? id_guru : '');
-
-        if (!status) $button.removeAttr('data-id-guru');
-
-        console.log(`Button diubah ke "${status ? 'Edit' : 'Input'} Wali Kelas" dengan ID Guru: ${id_guru || 'dihapus'}`);
-    }
-
-    $(document).on('click', '.btn-input', function () {
+    
+    $(document).on('click', '.btn-edit', function () {
         var id_guru = $(this).data('id');
         var id_kelas = $(this).data('id-kelas');
-        var nama_guru = $(this).data('id-nama');
-        console.log(nama_guru);
         
         // Konfirmasi sebelum mengirim data
         if (!confirm('Apakah Anda yakin ingin menambahkan guru ini ke kelas?')) {
@@ -192,7 +198,7 @@ $(document).ready(function() {
         }
 
         $.ajax({
-            url: '<?php echo base_url(); ?>'+control+'/AddWaliKelas',
+            url: '<?php echo base_url("kelas/AddWaliKelas"); ?>',
             type: 'POST',
             data: {
                 id_guru: id_guru,
@@ -204,10 +210,6 @@ $(document).ready(function() {
                     alert('Data berhasil ditambahkan!');
                     $('#myTable').DataTable().ajax.reload(); 
                     $('#SearchData').modal('hide');
-                    $('#namaguru').html(nama_guru);
-                    console.log(response);
-                    updateButtonStatus(response.status);
-
                 } else {
                     alert('Gagal menambahkan data: ' + response.message);
                 }
@@ -217,6 +219,31 @@ $(document).ready(function() {
                 alert('Terjadi kesalahan, coba lagi!');
             }
         });
+    });
+
+    var id_kelas = "<?php echo $dataDetail->id_kelas; ?>"; // Ambil ID kelas dari PHP
+
+    $.ajax({
+        url: "<?php echo base_url('kelas/cekGuruByKelas'); ?>",
+        type: "POST",
+        data: { id_kelas: id_kelas },
+        dataType: "json",
+        success: function(response) {
+            console.log("Response dari server:", response); // Debugging
+
+            if (response.status) {
+                // Jika guru sudah terdaftar, ubah button menjadi "Edit Wali Kelas"
+                $('#inputButton').removeClass('btn-success').addClass('btn-primary');
+                $('#inputButton').html('<i class="fas fa-download fa-sm text-white-50"></i> Edit Wali Kelas');
+            } else {
+                // Jika guru belum terdaftar, tetap "Input Wali Kelas"
+                $('#inputButton').removeClass('btn-primary').addClass('btn-success');
+                $('#inputButton').html('<i class="fas fa-download fa-sm text-white-50"></i> Input Wali Kelas');
+            }
+        },
+        error: function(xhr, status, error) {
+            console.log("AJAX Error:", xhr.responseText);
+        }
     });
 
 });

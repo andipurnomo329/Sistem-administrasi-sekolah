@@ -7,7 +7,39 @@
             <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" data-toggle="modal" data-target="#inputData"><i
                     class="fas fa-download fa-sm text-white-50"></i> Input <?php echo $pageTitle; ?></a>
         </div>
-        <div id='notif'></div>
+        
+        <div class="row">
+            <div class="col-md-12" id='infoProses'>
+                <?php
+                    $this->load->helper('form');
+                    $error = $this->session->flashdata('error');
+                    if($error)
+                    {
+                ?>
+                <div class="alert alert-danger alert-dismissable">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <?php echo $this->session->flashdata('error'); ?>                    
+                </div>
+                <?php } ?>
+                <?php  
+                    $success = $this->session->flashdata('success');
+                    if($success)
+                    {
+                ?>
+                <div class="alert alert-success alert-dismissable">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <?php echo $this->session->flashdata('success'); ?>
+                </div>
+                <?php } ?>
+                
+                <div class="row">
+                    <div class="col-md-12">
+                        <?php echo validation_errors('<div class="alert alert-danger alert-dismissable">', ' <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button></div>'); ?>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="row">            
             <!-- Approach -->
             <div class="col-xl-12 col-lg-4">
@@ -25,7 +57,6 @@
                                         <th>Tingkat</th>
                                         <th>Jurusan</th>
                                         <th>Tahun Ajaran</th>
-                                        <th>Kouta</th>
                                         <th>action</th>
                                     </tr>
                                 </thead>
@@ -46,13 +77,16 @@
 
 <script>
 $(document).ready(function() {
-    var control = 'kelas'
     var table = $('#myTable').DataTable({
         "processing": true,
         "serverSide": true,
         "ajax": {
-            "url": "<?php echo base_url() ?>"+control+"/getData/",
+            "url": "<?php echo base_url('kelas/getData/') ?>",
             "type": "POST",
+            "data": function(d) {
+                d.param = <?php echo $param; ?>,
+                d.inOut = '<?php echo $inOut; ?>' // Menambahkan parameter tambahan
+            }
         },
         "searchDelay": 500,
         "columns": [
@@ -68,7 +102,6 @@ $(document).ready(function() {
             { "data": "tingkat","width": "10%"},
             { "data": "jurusan" },
             { "data": "tahun_ajaran" },
-            { "data": "kouta", "render": data => `${data} Siswa` },
             {
                 "data": null,
                 "className": 'text-center',
@@ -84,16 +117,17 @@ $(document).ready(function() {
     $('#inputForm').on('submit', function(e) {
         e.preventDefault();
         $.ajax({
-            url: '<?php echo base_url() ?>'+control+'/addNewTask',
+            url: '<?php echo base_url('kelas/addNewTask') ?>',
             type: 'POST',
             data: $(this).serialize(),
             success: function(response) {
                 var data = JSON.parse(response);
+                // console.log(data.status);
+                // console.log(response.status); 
                 if(data.status){
                     $('#inputData').modal('hide');
                     $('#myTable').DataTable().ajax.reload();
-                    $('#inputForm')[0].reset();
-                    notifikasi = notifInput('success', 'Input  Kelas <b>'+ data.data.nama_kelas+'</b> berhasil !!');
+                    alert('Data Berhasil Ditambah')
                 }
             }
         });
@@ -102,17 +136,17 @@ $(document).ready(function() {
     $('#myTable tbody').on('click', '.btn-edit', function () {
         var id = $(this).data('id');
         $.ajax({
-            url: '<?php echo base_url() ?>'+control+'/getDataById',
+            url: '<?php echo base_url('kelas/getDataById') ?>',
             type: 'POST',
             data: {id: id},
             success: function(response) {
                 var data = JSON.parse(response);
                 console.log(data);
-                $.each(data, function (key, value) {
-                    console.log(key);
-                    console.log(value);
-                    $('#'+key+'_edit').val(value);
-                });
+                $('#idEdit').val(data.id_kelas);
+                $('#namaEdit').val(data.nama_kelas);
+                $('#tingkatEdit').val(data.tingkat);
+                $('#jurusnEdit').val(data.jurusan);
+                $('#tahunAjaranEdit').val(data.tahun_ajaran);
             }
         });
 
@@ -122,15 +156,17 @@ $(document).ready(function() {
     $('#editForm').on('submit', function(e) {
         e.preventDefault();
         $.ajax({
-            url: '<?php echo base_url() ?>'+control+'/updateData',
+            url: '<?php echo base_url('kelas/updateData') ?>',
             type: 'POST',
             data: $(this).serialize(),
             success: function(response) {
                 var data = JSON.parse(response);
+                console.log(data.status);
+                // console.log(response.status);
                 if(data.status){
                     $('#editData').modal('hide');
                     $('#myTable').DataTable().ajax.reload();
-                    notifikasi = notifInput('success', 'Edit  Kelas <b>'+ data.data.nama_kelas+'</b> berhasil !!');
+                    alert('Update Data Berhasil')
                 }
             }
         });
@@ -140,14 +176,15 @@ $(document).ready(function() {
         var id = $(this).data('id');
         if (confirm("Are you sure !") == true) {
             $.ajax({
-                url: '<?php echo base_url() ?>'+control+'/deleteData',
+                url: '<?php echo base_url('kelas/deleteData') ?>',
                 type: 'POST',
                 data: {id: id},
                 success: function(response) {
                     var data = JSON.parse(response);
+                    console.log(data.status);
+                    // console.log(response.status);
                     if(data.status){
                         $('#myTable').DataTable().ajax.reload();
-                        notifikasi = notifInput('success', 'Delete  Kelas berhasil !!');
                     }
                 }
             });

@@ -9,9 +9,6 @@ class Guru_model extends CI_Model
     protected $kolomJoin = 'id,nama,nik,jenis_kelamin';
     protected $kolomPeople = 'id,nama,nik,jenis_kelamin,alamat,tempat_lahir,tanggal_lahir,no_telp,jenis_kelamin,agama,foto';
 
-    protected $tableTrxGuru = 'trx_guru';
-    protected $kolomTrxGuru = 'id,id_guru,id_kelas';
-
 
     public function getRows($postData) {
         $response = array();
@@ -137,24 +134,5 @@ class Guru_model extends CI_Model
         
         return TRUE;
     }
-    
-
-    public function get_datatables()
-{
-    $this->db->select('tbl_guru.*');
-    $this->db->from('tbl_guru');
-    $this->db->join('trx_guru', 'trx_guru.id_guru = tbl_guru.id_guru', 'left');
-    $this->db->where('trx_guru.id_guru IS NULL'); // Hanya ambil guru yang belum jadi wali kelas
-
-    if (!empty($_POST['search']['value'])) {
-        $this->db->like('tbl_guru.nama', $_POST['search']['value']);
-    }
-
-    if (isset($_POST['start']) && $_POST['length'] != -1) {
-        $this->db->limit($_POST['length'], $_POST['start']);
-    }
-
-    return $this->db->get()->result();
-}
 
 }

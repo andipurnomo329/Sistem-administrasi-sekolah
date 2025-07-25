@@ -49,6 +49,16 @@ class Murid extends BaseController
             $this->loadViews2("murid/detailMurid", $this->global, $pageInfo , NULL, null);    
         }
     }
+    function pendaftaran(){
+        if(!$this->hasListAccess())
+        {
+            $this->loadThis();
+        }else{
+            $this->global['pageTitle'] = "Pendaftaran Murid";
+            $pageInfo='';
+            $this->loadViews2("murid/pendaftaranMurid", $this->global, $pageInfo , NULL, 'murid/pendaftaranModal');    
+        }
+    }
     public function getDataById() {
         $id = $this->input->post('id');
         $data = $this->km->getDatabyid($id);
@@ -58,7 +68,8 @@ class Murid extends BaseController
     public function getData() {
         $postData = $this->input->post();
         // debug($postData);
-        $data = $this->km->getRows($postData);
+        $data = $this->km->getDataTable($postData);
+        // debug($data['aaData']);
         // log_message('debug', 'Post Data: ' . print_r($postData, true)); // Tambahkan log untuk data POST
         echo json_encode($data);
     }

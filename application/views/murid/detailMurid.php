@@ -4,17 +4,13 @@
         <!-- Page Heading -->
         <div class="d-sm-flex align-items-center justify-content-between mb-4">
         <h1 class="h3 mb-0 text-gray-800"><?php echo $pageTitle; ?></h1>
-            <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" id='generateCV'><i
-                    class="fas fa-download fa-sm text-white-50"></i> Download CV</a>
+            <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" id='generateCV'><i class="fas fa-download fa-sm text-white-50"></i> Download CV</a>
         </div>
-        <!-- Card Example -->
         
         <div class="row">
-            <div class="col-md-12" id='infoProses'>
-            </div>
+            <div class="col-md-12" id='infoProses'></div>
         </div>
-        <div class="row">            
-            <!-- Approach -->
+        <div class="row">
             <div class="col-xl-4 col-md-6 mb-4">
                 <div class="card border-left-primary shadow h-100 py-2">
                     <div class="card-body">
@@ -25,20 +21,26 @@
                                 </div>
                                 <div class="text-center">
                                     <img class="img-fluid px-3 px-sm-4 mt-3 mb-4 " style="width: 20rem;" src="<?php echo base_url().'files/murid/'.$dataDetail->foto; ?>">
-                                    <div class="mb-0 font-weight-bold text-primary"><?php echo $dataDetail->nama; ?></div><hr/>
+                                    <div class="mb-0 font-weight-bold text-primary"><?= $dataDetail->nama ?></div><hr/>
                                 </div>
-                                <!-- <h6 class="m-0 font-weight-bold text-primary"> Jenis Penyaluran : <?php echo $dataDetail->keterangan . ' (' .$dataDetail->satuan.')'; ?></h6><hr/> -->
                                 <table class="table table-striped table-bordered">
                                     <tr>
                                         <td>NIS</td><td class="text-center"><?php echo $dataDetail->nis;?></td>
                                     </tr>
                                     <tr>
-                                        <td>NIK</td><td class="text-center"><?php echo $dataDetail->nik;?></td>
+                                        <td>NIK</td><td class="text-center"><?= $dataDetail->nik ?></td>
                                     </tr>
                                     <tr>
-                                        <td>Agama</td><td class="text-center" id='belumDisalurkan'><?php echo $dataDetail->agama;?></td>
+                                        <td>Tgl Lahir</td><td class="text-center"><?= $dataDetail->tanggal_lahir ?></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Agama</td><td class="text-center" id='belumDisalurkan'><?= $dataDetail->agama ?></td>
                                     </tr>
                                 </table>
+                                
+                                    <tr>
+                                        <td class="text-center"><?= $dataDetail->alamat ?></td>
+                                    </tr>
                             </div>
                             <div class="col-auto">            
                             </div>
@@ -47,6 +49,41 @@
                 </div>
             </div>
             <div class="col-xl-8 col-lg-4">
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3 border-left-primary">
+                        <h6 class="m-0 font-weight-bold text-primary">Data Keluarga</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table id="myTable" class="table table-striped table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th class='text-center'>No.</th>
+                                        <th>Nama</th>
+                                        <th>Hubungan Keluarga</th>
+                                        <th>Keterangan</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    
+                                    <tr>
+                                        <th class='text-center'>1</th>
+                                        <th><?= strtoupper($dataDetail->namaAyahKandung) ?></th>
+                                        <th>Orang Tua Laki-laki</th>
+                                        <th></th>
+                                    </tr>
+                                    
+                                    <tr>
+                                        <th class='text-center'>2</th>
+                                        <th><?= strtoupper($dataDetail->namaIbuKandung) ?></th>
+                                        <th>Orang Tua Perempuan</th>
+                                        <th></th>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
                 <div class="card shadow mb-4">
                     <div class="card-header py-3 border-left-primary">
                         <h6 class="m-0 font-weight-bold text-primary">History Kelas</h6>
